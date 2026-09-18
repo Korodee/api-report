@@ -228,7 +228,7 @@ function WebReport() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section section--last">
         <div className="section__head">
           <h2>ClickHouse, last 30 days</h2>
           <p>Web servers only. Bytes scanned, not a bill.</p>
@@ -295,33 +295,6 @@ function WebReport() {
           {fmtTb(WAREHOUSE.otherHost.heatmapLive.tb)}) that is not on the
           current web boxes or the API box.
         </p>
-      </section>
-
-      <section className="section section--last">
-        <h2>Keep in mind</h2>
-        <ol className="next-steps">
-          <li>
-            Web is subscription. We do not bill it in API units, but it is
-            where most of the ClickHouse work is.
-          </li>
-          <li>
-            Range limits and timeslots are polling. Heatmap, Strike, and Depth
-            View are the actual charts.
-          </li>
-          <li>
-            HTTP here is market hours this week, not a full month. Do not
-            scale it out to 30 days. ClickHouse above is still 30 days.
-          </li>
-          <li>
-            The basic vs advanced split is a sketch from this week’s mix.
-            Warehouse cost by expiration bucket is the next thing to check
-            before anyone sells it.
-          </li>
-          <li>
-            Basic vs advanced above is from this week&apos;s mix, not from
-            talking to customers yet.
-          </li>
-        </ol>
       </section>
     </div>
   );
