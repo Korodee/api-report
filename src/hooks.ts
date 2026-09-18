@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import type { SurfaceId } from "./data";
 
 export type Theme = "light" | "dark";
+export type { SurfaceId };
 
 const STORAGE_KEY = "api-report-theme";
 
@@ -17,6 +19,28 @@ function readStoredTheme(): Theme | null {
 
 export function applyTheme(theme: Theme): void {
   document.documentElement.dataset.theme = theme;
+}
+
+function readSurface(): SurfaceId {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("surface") === "api" ? "api" : "web";
+}
+
+export function useSurface(): {
+  surface: SurfaceId;
+  setSurface: (next: SurfaceId) => void;
+} {
+  const [surface, setSurfaceState] = useState<SurfaceId>(readSurface);
+
+  function setSurface(next: SurfaceId) {
+    setSurfaceState(next);
+    const url = new URL(window.location.href);
+    if (next === "web") url.searchParams.delete("surface");
+    else url.searchParams.set("surface", "api");
+    window.history.replaceState({}, "", url);
+  }
+
+  return { surface, setSurface };
 }
 
 export function useTheme(): { theme: Theme; toggleTheme: () => void } {

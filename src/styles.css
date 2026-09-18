@@ -100,6 +100,68 @@ h1 {
   font-size: 14px;
 }
 
+.tabs {
+  display: inline-flex;
+  margin-top: 18px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  gap: 2px;
+}
+
+.tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.is-active {
+  background: var(--hover);
+  color: var(--text);
+  font-weight: 500;
+}
+
+.surface {
+  display: none;
+}
+
+.surface.is-active {
+  display: block;
+}
+
+.print-only {
+  display: none;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.86em;
+}
+
+.path {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.warehouse-table {
+  margin-top: 12px;
+}
+
+.data-table--paths {
+  min-width: 640px;
+}
+
 .meta {
   display: grid;
   gap: 10px 24px;
@@ -109,7 +171,7 @@ h1 {
 
 .meta div {
   display: grid;
-  grid-template-columns: 64px 1fr;
+  grid-template-columns: 76px 1fr;
   gap: 8px;
 }
 
@@ -143,11 +205,15 @@ h1 {
 }
 
 .lede {
-  max-width: 72ch;
+  max-width: 82ch;
   margin: 28px 0 0;
   color: var(--text);
   font-size: 16px;
   line-height: 1.6;
+}
+
+.lede--follow {
+  margin-top: 12px;
 }
 
 .metrics {
@@ -181,6 +247,7 @@ h1 {
   margin-top: 6px;
   color: var(--muted);
   font-size: 13px;
+  white-space: nowrap;
 }
 
 .section {
@@ -211,6 +278,10 @@ h3 {
   font-weight: 500;
   color: var(--muted);
   letter-spacing: 0.01em;
+}
+
+.subhead {
+  margin-top: 32px;
 }
 
 .chart-frame {
@@ -270,7 +341,7 @@ h3 {
   margin-top: 14px;
   color: var(--muted);
   font-size: 13px;
-  max-width: 72ch;
+  max-width: 82ch;
   line-height: 1.55;
 }
 
@@ -411,7 +482,7 @@ h3 {
   padding-left: 18px;
   color: var(--muted);
   font-size: 14px;
-  max-width: 72ch;
+  max-width: 82ch;
 }
 
 .next-steps li + li {
@@ -530,6 +601,10 @@ h3 {
     font-size: 22px;
   }
 
+  .metric__label {
+    white-space: normal;
+  }
+
   .model-stat strong {
     font-size: 28px;
   }
@@ -566,8 +641,23 @@ h3 {
   }
 
   .theme-toggle,
-  .meta__theme {
+  .meta__theme,
+  .tabs {
     display: none;
+  }
+
+  .surface {
+    display: block !important;
+  }
+
+  .surface + .surface {
+    break-before: page;
+    padding-top: 8px;
+  }
+
+  .print-only {
+    display: block;
+    margin: 16px 0 8px;
   }
 
   .section,

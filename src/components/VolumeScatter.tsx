@@ -9,12 +9,8 @@ import {
   YAxis,
   ZAxis,
 } from "recharts";
-import {
-  billingStatus,
-  MODULES,
-  type ModuleRow,
-} from "../data";
-import { fmtInt, fmtPct, fmtRt } from "../format";
+import { billingStatus, type TrafficRow } from "../data";
+import { fmtInt, fmtPct, fmtRt, niceCeil } from "../format";
 import { useChartColors, useMediaQuery } from "../hooks";
 import { ChartTooltip } from "./ChartTooltip";
 
@@ -26,50 +22,59 @@ type LabelLayout = {
 
 const LABEL_LAYOUT: Record<string, LabelLayout> = {
   heatmap: { dx: 10, dy: -12, anchor: "start" },
-  "breakdown-by-strike": { dx: -10, dy: -12, anchor: "end" },
-  "intraday-timeslots": { dx: -10, dy: -12, anchor: "end" },
-  depthview: { dx: 10, dy: -12, anchor: "start" },
+  "breakdown-by-strike": { dx: 0, dy: -20, anchor: "middle" },
+  "intraday-timeslots": { dx: 0, dy: -18, anchor: "middle" },
+  depthview: { dx: 10, dy: 18, anchor: "start" },
   "breakdown-by-expiration": { dx: 10, dy: -16, anchor: "start" },
-  "expiration-dates": { dx: 10, dy: 18, anchor: "start" },
+  "expiration-dates": { dx: 10, dy: 16, anchor: "start" },
+  "mm-exposure": { dx: -10, dy: 16, anchor: "end" },
+  candles: { dx: -10, dy: 16, anchor: "end" },
 };
 
 const COMPACT_LAYOUT: Record<string, LabelLayout> = {
-  heatmap: { dx: 8, dy: -10, anchor: "start" },
-  "breakdown-by-strike": { dx: -8, dy: -12, anchor: "end" },
-  "intraday-timeslots": { dx: -8, dy: 16, anchor: "end" },
-  depthview: { dx: 8, dy: -12, anchor: "start" },
-  "breakdown-by-expiration": { dx: 8, dy: -16, anchor: "start" },
+  heatmap: { dx: -8, dy: -10, anchor: "end" },
+  "breakdown-by-strike": { dx: 0, dy: -16, anchor: "middle" },
+  "intraday-timeslots": { dx: 0, dy: -16, anchor: "middle" },
+  depthview: { dx: 8, dy: 16, anchor: "start" },
+  "breakdown-by-expiration": { dx: 8, dy: -14, anchor: "start" },
   "expiration-dates": { dx: 8, dy: 14, anchor: "start" },
+  "mm-exposure": { dx: -8, dy: 14, anchor: "end" },
+  candles: { dx: -8, dy: 14, anchor: "end" },
 };
 
 function ScatterTooltip({
   active,
   payload,
+  showBilling,
 }: {
   active?: boolean;
-  payload?: Array<{ payload: ModuleRow }>;
+  payload?: Array<{ payload: TrafficRow }>;
+  showBilling: boolean;
 }) {
   if (!active || !payload?.[0]) return null;
   const row = payload[0].payload;
-  return (
-    <ChartTooltip
-      title={row.label}
-      rows={[
-        { label: "Requests · 30d", value: fmtInt(row.calls30d) },
-        { label: "Avg. response time", value: fmtRt(row.avgRtS) },
-        { label: "≥1s", value: fmtPct(row.pctGe1s) },
-        { label: "Current billing", value: billingStatus(row) },
-        {
-          label: "Proposed units",
-          value: String(row.proposedUnits),
-        },
-      ]}
-    />
-  );
+  const rows = [
+    { label: "Requests", value: fmtInt(row.calls) },
+    { label: "Avg. response time", value: fmtRt(row.avgRtS) },
+    { label: "≥1s", value: fmtPct(row.pctGe1s) },
+  ];
+  if (showBilling) {
+    rows.push({ label: "Current billing", value: billingStatus(row) });
+    if (row.proposedUnits != null) {
+      rows.push({ label: "Proposed units", value: String(row.proposedUnits) });
+    }
+  } else {
+    rows.push({
+      label: "Kind",
+      value: row.kind === "helper" ? "Helper / polling" : "Chart payload",
+    });
+  }
+  return <ChartTooltip title={row.label} rows={rows} />;
 }
 
 function formatX(value: number): string {
   if (value === 0) return "0";
+  if (value >= 1_000_000) return `${Math.round(value / 100_000) / 10}m`;
   return `${Math.round(value / 1000)}k`;
 }
 
@@ -80,17 +85,18 @@ function LabeledDot({
   fill,
   stroke,
   compact,
+  hollow,
 }: {
   cx?: number;
   cy?: number;
-  payload?: ModuleRow;
+  payload?: TrafficRow;
   fill: string;
   stroke: string;
   compact: boolean;
+  hollow: boolean;
 }): ReactElement {
   if (cx == null || cy == null || !payload) return <g />;
   const layout = (compact ? COMPACT_LAYOUT : LABEL_LAYOUT)[payload.id];
-  const label = payload.chartLabel;
   return (
     <g>
       <circle
@@ -99,7 +105,7 @@ function LabeledDot({
         r={compact ? 5.5 : 6.5}
         fill={fill}
         stroke={stroke}
-        strokeWidth={payload.billable ? 0 : 1.5}
+        strokeWidth={hollow ? 1.5 : 0}
       />
       {layout ? (
         <text
@@ -108,7 +114,7 @@ function LabeledDot({
           textAnchor={layout.anchor}
           className="scatter-label"
         >
-          {label}
+          {payload.chartLabel}
         </text>
       ) : null}
     </g>
@@ -120,11 +126,12 @@ function renderDot(
   fill: string,
   stroke: string,
   compact: boolean,
+  hollow: boolean,
 ): ReactElement {
   const point = props as {
     cx?: number;
     cy?: number;
-    payload?: ModuleRow;
+    payload?: TrafficRow;
   };
   return (
     <LabeledDot
@@ -134,21 +141,37 @@ function renderDot(
       fill={fill}
       stroke={stroke}
       compact={compact}
+      hollow={hollow}
     />
   );
 }
 
-export function VolumeScatter() {
+export function VolumeScatter({
+  rows,
+  showBilling = false,
+  colorBy = "kind",
+}: {
+  rows: TrafficRow[];
+  showBilling?: boolean;
+  colorBy?: "kind" | "billable";
+}) {
   const colors = useChartColors();
   const compact = useMediaQuery("(max-width: 720px)");
-  const billable = MODULES.filter((row) => row.billable);
-  const free = MODULES.filter((row) => !row.billable);
+  const primary =
+    colorBy === "billable"
+      ? rows.filter((row) => row.billable)
+      : rows.filter((row) => row.kind === "chart");
+  const secondary =
+    colorBy === "billable"
+      ? rows.filter((row) => !row.billable)
+      : rows.filter((row) => row.kind === "helper");
+  const maxX = niceCeil(Math.max(...rows.map((row) => row.calls)) * 1.08);
+  const maxY = niceCeil(Math.max(...rows.map((row) => row.avgRtS)) * 1.12);
 
-  const renderBillable = (props: unknown) =>
-    renderDot(props, colors.accent, colors.accent, compact);
-
-  const renderFree = (props: unknown) =>
-    renderDot(props, "var(--bg)", colors.accentMuted, compact);
+  const renderChart = (props: unknown) =>
+    renderDot(props, colors.accent, colors.accent, compact, false);
+  const renderHelper = (props: unknown) =>
+    renderDot(props, "var(--bg)", colors.accentMuted, compact, true);
 
   return (
     <div className="chart-frame chart-frame--scatter">
@@ -164,16 +187,15 @@ export function VolumeScatter() {
           <CartesianGrid stroke={colors.line} />
           <XAxis
             type="number"
-            dataKey="calls30d"
+            dataKey="calls"
             name="Requests"
             tickFormatter={formatX}
             tick={{ fill: colors.muted, fontSize: 11 }}
             axisLine={{ stroke: colors.line }}
             tickLine={false}
-            domain={[0, 220000]}
-            ticks={[0, 50000, 100000, 150000, 200000]}
+            domain={[0, maxX]}
             label={{
-              value: "Requests over 30 days",
+              value: "Requests",
               position: "insideBottom",
               offset: -2,
               fill: colors.muted,
@@ -188,7 +210,7 @@ export function VolumeScatter() {
             tick={{ fill: colors.muted, fontSize: 11 }}
             axisLine={{ stroke: colors.line }}
             tickLine={false}
-            domain={[0, 2.8]}
+            domain={[0, maxY]}
             padding={{ top: 8, bottom: 20 }}
             width={40}
           />
@@ -198,20 +220,28 @@ export function VolumeScatter() {
               stroke: colors.line,
               strokeDasharray: "3 3",
             }}
-            content={<ScatterTooltip />}
+            content={(props) => (
+              <ScatterTooltip
+                active={props.active}
+                payload={
+                  props.payload as Array<{ payload: TrafficRow }> | undefined
+                }
+                showBilling={showBilling}
+              />
+            )}
             isAnimationActive={false}
           />
           <Scatter
-            name="Billable"
-            data={billable}
+            name="Primary"
+            data={primary}
             isAnimationActive={false}
-            shape={renderBillable}
+            shape={renderChart}
           />
           <Scatter
-            name="Not billed"
-            data={free}
+            name="Secondary"
+            data={secondary}
             isAnimationActive={false}
-            shape={renderFree}
+            shape={renderHelper}
           />
         </ScatterChart>
       </ResponsiveContainer>
