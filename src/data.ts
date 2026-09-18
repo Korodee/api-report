@@ -381,42 +381,62 @@ export const API_STRIKE_EXPIRY: ShareRow[] = [
 ];
 
 /** Suggested web tiers. $249 is today’s Pro Max. */
+export const PLAN_LITE = { name: "Lite", monthly: 99, yearly: 990 };
 export const PLAN_CORE = { name: "Core", monthly: 149, yearly: 1490 };
 export const PLAN_ADV = { name: "Pro Max", monthly: 249, yearly: 2499 };
 
 export type PlanFeatureRow = {
   id: string;
   label: string;
+  lite: string;
   core: string;
   advanced: string;
 };
 
 export const PLAN_FEATURES: PlanFeatureRow[] = [
-  { id: "live", label: "Live / intraday", core: "Yes", advanced: "Yes" },
-  { id: "ticker", label: "Tickers", core: "SPX", advanced: "SPX + VIX" },
-  { id: "heatmap", label: "Heatmap", core: "Gamma, Charm · 2D", advanced: "All greeks · 3D" },
+  { id: "live", label: "Live / intraday", lite: "Yes", core: "Yes", advanced: "Yes" },
+  { id: "ticker", label: "Tickers", lite: "SPX", core: "SPX", advanced: "SPX + VIX" },
+  {
+    id: "heatmap",
+    label: "Heatmap",
+    lite: "Gamma · 2D",
+    core: "Gamma, Charm · 2D",
+    advanced: "All greeks · 3D",
+  },
   {
     id: "metrics",
     label: "Strike / Depth metrics",
+    lite: "Net position, GEX",
     core: "Net position, GEX",
     advanced: "+ DEX, VEX, CEX",
   },
   {
     id: "expiry",
     label: "Expirations",
+    lite: "0DTE only",
     core: "0DTE + short presets",
     advanced: "Any date, lists, full term",
   },
   {
+    id: "depth",
+    label: "Depth View",
+    lite: "—",
+    core: "Table",
+    advanced: "Table + heatmap",
+  },
+  {
     id: "by-exp",
     label: "Breakdown by Expiration",
+    lite: "—",
     core: "—",
     advanced: "Yes",
   },
-  { id: "vol", label: "Vol dashboard", core: "—", advanced: "Yes" },
-  { id: "api", label: "Developer API", core: "—", advanced: "Yes" },
+  { id: "vol", label: "Vol dashboard", lite: "—", core: "—", advanced: "Yes" },
+  { id: "api", label: "Developer API", lite: "—", core: "—", advanced: "Yes" },
 ];
 
+const heatmapLiteCalls =
+  WEB_GREEKS.find((row) => row.id === "gamma")?.calls ?? 0;
 const heatmapCoreCalls = WEB_GREEKS.filter(
   (row) => row.id === "gamma" || row.id === "charm",
 ).reduce((sum, row) => sum + row.calls, 0);
@@ -427,6 +447,7 @@ const strikeCoreMetricCalls = WEB_STRIKE_METRICS.filter(
 ).reduce((sum, row) => sum + row.calls, 0);
 
 export const planCoverage = {
+  heatmapLitePct: (heatmapLiteCalls / WEB_GREEK_TOTAL) * 100,
   heatmapCorePct: (heatmapCoreCalls / WEB_GREEK_TOTAL) * 100,
   strike0dtePct: (strike0dteCalls / WEB_STRIKE_PARAM_TOTAL) * 100,
   strikeNetGexPct: (strikeCoreMetricCalls / WEB_STRIKE_PARAM_TOTAL) * 100,

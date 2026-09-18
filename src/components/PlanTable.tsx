@@ -1,5 +1,5 @@
 import type { PlanFeatureRow } from "../data";
-import { PLAN_ADV, PLAN_CORE } from "../data";
+import { PLAN_ADV, PLAN_CORE, PLAN_LITE } from "../data";
 
 export function PlanTable({ rows }: { rows: PlanFeatureRow[] }) {
   return (
@@ -8,6 +8,9 @@ export function PlanTable({ rows }: { rows: PlanFeatureRow[] }) {
         <thead>
           <tr>
             <th></th>
+            <th>
+              {PLAN_LITE.name} · ${PLAN_LITE.monthly}/mo
+            </th>
             <th>
               {PLAN_CORE.name} · ${PLAN_CORE.monthly}/mo
             </th>
@@ -20,6 +23,7 @@ export function PlanTable({ rows }: { rows: PlanFeatureRow[] }) {
           {rows.map((row) => (
             <tr key={row.id}>
               <td>{row.label}</td>
+              <td>{row.lite}</td>
               <td>{row.core}</td>
               <td>{row.advanced}</td>
             </tr>

@@ -19,8 +19,8 @@ import {
   PLAN_ADV,
   PLAN_CORE,
   PLAN_FEATURES,
+  PLAN_LITE,
   PULLED_AT,
-  planCoverage,
   unitMultiplier,
   WAREHOUSE,
   WEB_GREEK_TOTAL,
@@ -215,44 +215,36 @@ function WebReport() {
         <div className="section__head">
           <h2>If we split the $249 plan</h2>
           <p>
-            Pro Max is $249 today and includes everything. Most of the traffic
-            sits in a smaller box. Core is live SPX for that box. Pro Max stays
-            $249 for the rest.
+            Three live rungs. Lite is the 0DTE Gamma wedge. Core adds Charm
+            and a bit more expiration. Pro Max stays $249 for the rest.
           </p>
         </div>
-        <div className="metrics" aria-label="Suggested plan prices">
-          <div className="metric">
-            <div className="metric__value">${PLAN_CORE.monthly}</div>
-            <div className="metric__label">
-              Core / mo · ${fmtInt(PLAN_CORE.yearly)} / yr
+        <div className="comparison" aria-label="Suggested plan prices">
+          <div>
+            <div className="comparison__label">
+              {PLAN_LITE.name} · ${fmtInt(PLAN_LITE.yearly)} / yr
             </div>
+            <div className="comparison__value">${PLAN_LITE.monthly}/mo</div>
           </div>
-          <div className="metric">
-            <div className="metric__value">${PLAN_ADV.monthly}</div>
-            <div className="metric__label">
-              Pro Max / mo · ${fmtInt(PLAN_ADV.yearly)} / yr
+          <div>
+            <div className="comparison__label">
+              {PLAN_CORE.name} · ${fmtInt(PLAN_CORE.yearly)} / yr
             </div>
+            <div className="comparison__value">${PLAN_CORE.monthly}/mo</div>
           </div>
-          <div className="metric">
-            <div className="metric__value">
-              {planCoverage.heatmapCorePct.toFixed(0)}%
+          <div>
+            <div className="comparison__label">
+              {PLAN_ADV.name} · ${fmtInt(PLAN_ADV.yearly)} / yr
             </div>
-            <div className="metric__label">heatmap calls Core covers</div>
-          </div>
-          <div className="metric">
-            <div className="metric__value">
-              {planCoverage.strike0dtePct.toFixed(0)}%
-            </div>
-            <div className="metric__label">strike calls that are 0DTE</div>
+            <div className="comparison__value">${PLAN_ADV.monthly}/mo</div>
           </div>
         </div>
         <PlanTable rows={PLAN_FEATURES} />
         <p className="insight">
-          Core still has to be live. 0DTE is 72% of Strike — delayed daily data
-          does not compete there. Delayed Pro at $199 would sit above a $149 live
-          Core, so that tier probably gets folded or dropped. Developer API and
-          the vol dashboard stay on Pro Max. Do not put “all expirations” on
-          Core; that is the expensive API habit, not the web default.
+          All three are live. Lite is Gamma + 0DTE. Core adds Charm and short
+          expiration presets. Pro Max is the rest. Delayed Pro at $199 is worse
+          than both Lite and Core, so it probably gets folded. API and the vol
+          dashboard stay on Pro Max.
         </p>
       </section>
 
