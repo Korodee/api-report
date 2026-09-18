@@ -420,6 +420,17 @@ h3 {
   font-variant-numeric: tabular-nums;
 }
 
+.plan-table {
+  margin-top: 8px;
+}
+
+.plan-table th:nth-child(2),
+.plan-table td:nth-child(2),
+.plan-table th:nth-child(3),
+.plan-table td:nth-child(3) {
+  width: 32%;
+}
+
 .comparison {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

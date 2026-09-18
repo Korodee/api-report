@@ -380,6 +380,58 @@ export const API_STRIKE_EXPIRY: ShareRow[] = [
   { id: "upcoming", label: "Upcoming", calls: 424 },
 ];
 
+/** Suggested web tiers. $249 is today’s Pro Max. */
+export const PLAN_CORE = { name: "Core", monthly: 149, yearly: 1490 };
+export const PLAN_ADV = { name: "Pro Max", monthly: 249, yearly: 2499 };
+
+export type PlanFeatureRow = {
+  id: string;
+  label: string;
+  core: string;
+  advanced: string;
+};
+
+export const PLAN_FEATURES: PlanFeatureRow[] = [
+  { id: "live", label: "Live / intraday", core: "Yes", advanced: "Yes" },
+  { id: "ticker", label: "Tickers", core: "SPX", advanced: "SPX + VIX" },
+  { id: "heatmap", label: "Heatmap", core: "Gamma, Charm · 2D", advanced: "All greeks · 3D" },
+  {
+    id: "metrics",
+    label: "Strike / Depth metrics",
+    core: "Net position, GEX",
+    advanced: "+ DEX, VEX, CEX",
+  },
+  {
+    id: "expiry",
+    label: "Expirations",
+    core: "0DTE + short presets",
+    advanced: "Any date, lists, full term",
+  },
+  {
+    id: "by-exp",
+    label: "Breakdown by Expiration",
+    core: "—",
+    advanced: "Yes",
+  },
+  { id: "vol", label: "Vol dashboard", core: "—", advanced: "Yes" },
+  { id: "api", label: "Developer API", core: "—", advanced: "Yes" },
+];
+
+const heatmapCoreCalls = WEB_GREEKS.filter(
+  (row) => row.id === "gamma" || row.id === "charm",
+).reduce((sum, row) => sum + row.calls, 0);
+const strike0dteCalls =
+  WEB_STRIKE_EXPIRY.find((row) => row.id === "0dte")?.calls ?? 0;
+const strikeCoreMetricCalls = WEB_STRIKE_METRICS.filter(
+  (row) => row.id === "NET_POSITION" || row.id === "GEX",
+).reduce((sum, row) => sum + row.calls, 0);
+
+export const planCoverage = {
+  heatmapCorePct: (heatmapCoreCalls / WEB_GREEK_TOTAL) * 100,
+  strike0dtePct: (strike0dteCalls / WEB_STRIKE_PARAM_TOTAL) * 100,
+  strikeNetGexPct: (strikeCoreMetricCalls / WEB_STRIKE_PARAM_TOTAL) * 100,
+};
+
 export const WAREHOUSE: {
   web: WarehouseSlice & {
     heatmapLive: WarehouseSlice;

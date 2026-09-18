@@ -2,6 +2,7 @@ import { TrafficChart } from "./components/TrafficChart";
 import { VolumeScatter } from "./components/VolumeScatter";
 import { ModuleTable } from "./components/ModuleTable";
 import { PathTable } from "./components/PathTable";
+import { PlanTable } from "./components/PlanTable";
 import { ShareTable } from "./components/ShareTable";
 import {
   API_GREEKS,
@@ -15,7 +16,11 @@ import {
   apiTrafficInsightApplies,
   CH_WINDOW_LABEL,
   modulesByProposedUnits,
+  PLAN_ADV,
+  PLAN_CORE,
+  PLAN_FEATURES,
   PULLED_AT,
+  planCoverage,
   unitMultiplier,
   WAREHOUSE,
   WEB_GREEK_TOTAL,
@@ -200,32 +205,55 @@ function WebReport() {
           nameHeader="Selection"
         />
         <p className="insight">
-          Almost all of this is SPX. A cheaper basic plan can cover the
-          volume: Gamma and Charm, Strike on 0DTE with net position or GEX,
-          plus Depth View. Vanna, 3D, DEX / VEX / CEX, and picking a list of
-          expirations are the thinner usage — that is the advanced tier if
-          we split this way. Sketch, not a packaging decision.
+          Almost all of this is SPX. Gamma and Charm, Strike on 0DTE with net
+          position or GEX — that is the cheap-plan mix. Vanna, 3D, DEX / VEX /
+          CEX, and picking a list of expirations are the thinner usage.
         </p>
-        <div className="split" style={{ marginTop: 28 }}>
-          <div>
-            <h3>Basic (sketch)</h3>
-            <ul className="next-steps">
-              <li>SPX</li>
-              <li>Heatmap: Gamma + Charm (2D)</li>
-              <li>Strike: 0DTE, net position + GEX</li>
-              <li>Depth View table</li>
-            </ul>
+      </section>
+
+      <section className="section">
+        <div className="section__head">
+          <h2>If we split the $249 plan</h2>
+          <p>
+            Pro Max is $249 today and includes everything. Most of the traffic
+            sits in a smaller box. Core is live SPX for that box. Pro Max stays
+            $249 for the rest.
+          </p>
+        </div>
+        <div className="metrics" aria-label="Suggested plan prices">
+          <div className="metric">
+            <div className="metric__value">${PLAN_CORE.monthly}</div>
+            <div className="metric__label">
+              Core / mo · ${fmtInt(PLAN_CORE.yearly)} / yr
+            </div>
           </div>
-          <div>
-            <h3>Advanced (sketch)</h3>
-            <ul className="next-steps">
-              <li>Vanna and 3D heatmaps</li>
-              <li>DEX / VEX / CEX</li>
-              <li>Custom expiration lists, longer windows</li>
-              <li>Breakdown by Expiration, VIX</li>
-            </ul>
+          <div className="metric">
+            <div className="metric__value">${PLAN_ADV.monthly}</div>
+            <div className="metric__label">
+              Pro Max / mo · ${fmtInt(PLAN_ADV.yearly)} / yr
+            </div>
+          </div>
+          <div className="metric">
+            <div className="metric__value">
+              {planCoverage.heatmapCorePct.toFixed(0)}%
+            </div>
+            <div className="metric__label">heatmap calls Core covers</div>
+          </div>
+          <div className="metric">
+            <div className="metric__value">
+              {planCoverage.strike0dtePct.toFixed(0)}%
+            </div>
+            <div className="metric__label">strike calls that are 0DTE</div>
           </div>
         </div>
+        <PlanTable rows={PLAN_FEATURES} />
+        <p className="insight">
+          Core still has to be live. 0DTE is 72% of Strike — delayed daily data
+          does not compete there. Delayed Pro at $199 would sit above a $149 live
+          Core, so that tier probably gets folded or dropped. Developer API and
+          the vol dashboard stay on Pro Max. Do not put “all expirations” on
+          Core; that is the expensive API habit, not the web default.
+        </p>
       </section>
 
       <section className="section section--last">
