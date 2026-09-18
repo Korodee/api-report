@@ -405,9 +405,9 @@ export const PLAN_FEATURES: PlanFeatureRow[] = [
   },
   {
     id: "metrics",
-    label: "Strike / Depth metrics",
-    lite: "Net position, GEX",
-    core: "Net position, GEX",
+    label: "Strike metrics",
+    lite: "GEX",
+    core: "+ Net position",
     advanced: "+ DEX, VEX, CEX",
   },
   {
@@ -421,8 +421,8 @@ export const PLAN_FEATURES: PlanFeatureRow[] = [
     id: "depth",
     label: "Depth View",
     lite: "—",
-    core: "Table",
-    advanced: "Table + heatmap",
+    core: "Yes",
+    advanced: "Yes",
   },
   {
     id: "by-exp",

@@ -205,9 +205,10 @@ function WebReport() {
           nameHeader="Selection"
         />
         <p className="insight">
-          Almost all of this is SPX. Gamma and Charm, Strike on 0DTE with net
-          position or GEX — that is the cheap-plan mix. Vanna, 3D, DEX / VEX /
-          CEX, and picking a list of expirations are the thinner usage.
+          Almost all of this is SPX. Lite is the cheap wedge: Gamma and GEX on
+          0DTE. Net position is most of Strike — that starts at Core, with
+          Charm. Vanna, 3D, DEX / VEX / CEX, and picking a list of expirations
+          stay on Pro Max.
         </p>
       </section>
 
@@ -215,8 +216,8 @@ function WebReport() {
         <div className="section__head">
           <h2>If we split the $249 plan</h2>
           <p>
-            Three live rungs. Lite is the 0DTE Gamma wedge. Core adds Charm
-            and a bit more expiration. Pro Max stays $249 for the rest.
+            Three live rungs. Lite is Gamma + GEX + 0DTE. Core adds net
+            position, Charm, and Depth View. Pro Max stays $249 for the rest.
           </p>
         </div>
         <div className="comparison" aria-label="Suggested plan prices">
@@ -241,9 +242,10 @@ function WebReport() {
         </div>
         <PlanTable rows={PLAN_FEATURES} />
         <p className="insight">
-          All three are live. Lite is Gamma + 0DTE. Core adds Charm and short
-          expiration presets. Pro Max is the rest. Delayed Pro at $199 is worse
-          than both Lite and Core, so it probably gets folded. API and the vol
+          Net position starts at Core — it is most of Strike, so that is the
+          upgrade. Depth View is one chart (SciChart, looks like a table), not
+          a table vs heatmap split; it starts at Core. Delayed Pro at $199 is
+          worse than Lite and Core, so it probably gets folded. API and the vol
           dashboard stay on Pro Max.
         </p>
       </section>
