@@ -504,7 +504,7 @@ function ApiReport() {
         <ModuleTable rows={API_MODULES} mode="api" />
       </section>
 
-      <section className="section">
+      <section className="section section--last">
         <div className="section__head">
           <h2>ClickHouse, last 30 days</h2>
           <p>API box only.</p>
@@ -562,25 +562,6 @@ function ApiReport() {
           {fmtTb(WAREHOUSE.api.timeslots.tb)} over 30 days. Strike and Depth
           View look the same as web in SQL, so they are not split here.
         </p>
-      </section>
-
-      <section className="section section--last">
-        <h2>Before we change billing</h2>
-        <ol className="next-steps">
-          <li>
-            Heatmap is the one module we can isolate in SQL, and it eats most
-            of the API warehouse. 9 units is still a guess, but it is not
-            only wall-clock anymore.
-          </li>
-          <li>
-            We need to run this against actual customer quotas before anyone
-            ships a weight change.
-          </li>
-          <li>
-            Timeslots is free and still costs warehouse. Decide what happens
-            when someone hits the global overage cap.
-          </li>
-        </ol>
       </section>
     </div>
   );
