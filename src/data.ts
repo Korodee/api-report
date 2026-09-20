@@ -355,6 +355,26 @@ export const WEB_STRIKE_EXPIRY: ShareRow[] = [
   { id: "other", label: "Other ranges / later DTE", calls: 9_653 },
 ];
 
+/**
+ * Web FLOW is `flow_type=rolling|anchor` (market did not show up this week).
+ * Snapshot = no FLOW param. Same RTH window as WEB_PATHS. Heatmap: 0.
+ * Expiration chart: 7.6% FLOW (7,429 / 98,325) — not a separate table.
+ */
+export const WEB_STRIKE_FLOW: ShareRow[] = [
+  { id: "snapshot", label: "Snapshot (no FLOW)", calls: 538_200 },
+  { id: "rolling", label: "FLOW · rolling", calls: 40_376 },
+  { id: "anchor", label: "FLOW · anchor", calls: 13_227 },
+];
+
+/** Depth URIs we could parse for flow_type. Module total is a bit higher. */
+export const WEB_DEPTH_FLOW_TOTAL = 732_505;
+
+export const WEB_DEPTH_FLOW: ShareRow[] = [
+  { id: "snapshot", label: "Snapshot (no FLOW)", calls: 685_716 },
+  { id: "anchor", label: "FLOW · anchor", calls: 32_722 },
+  { id: "rolling", label: "FLOW · rolling", calls: 14_067 },
+];
+
 export const API_HEATMAP_PARAM_TOTAL = 121_778;
 export const API_STRIKE_PARAM_TOTAL = 186_785;
 
@@ -378,6 +398,20 @@ export const API_STRIKE_EXPIRY: ShareRow[] = [
   { id: "specific", label: "Specific dates", calls: 45_609 },
   { id: "range", label: "Range", calls: 16_013 },
   { id: "upcoming", label: "Upcoming", calls: 424 },
+];
+
+/** API FLOW is `mode=flow` vs `mode=net`. Same 30d APIRequestLog. */
+export const API_STRIKE_FLOW_TOTAL = 180_233;
+export const API_DEPTH_FLOW_TOTAL = 132_373;
+
+export const API_STRIKE_FLOW: ShareRow[] = [
+  { id: "net", label: "Snapshot (mode=net)", calls: 177_699 },
+  { id: "flow", label: "FLOW (mode=flow)", calls: 2_534 },
+];
+
+export const API_DEPTH_FLOW: ShareRow[] = [
+  { id: "net", label: "Snapshot (mode=net)", calls: 127_882 },
+  { id: "flow", label: "FLOW (mode=flow)", calls: 4_491 },
 ];
 
 /** Suggested web tiers. $249 is today’s Pro Max. */
@@ -422,6 +456,13 @@ export const PLAN_FEATURES: PlanFeatureRow[] = [
     label: "Depth View",
     lite: "—",
     core: "Yes",
+    advanced: "Yes",
+  },
+  {
+    id: "flow",
+    label: "FLOW mode",
+    lite: "—",
+    core: "—",
     advanced: "Yes",
   },
   {

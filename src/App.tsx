@@ -5,11 +5,15 @@ import { PathTable } from "./components/PathTable";
 import { PlanTable } from "./components/PlanTable";
 import { ShareTable } from "./components/ShareTable";
 import {
+  API_DEPTH_FLOW,
+  API_DEPTH_FLOW_TOTAL,
   API_GREEKS,
   API_HEATMAP_PARAM_TOTAL,
   API_HTTP_WINDOW_LABEL,
   API_MODULES,
   API_STRIKE_EXPIRY,
+  API_STRIKE_FLOW,
+  API_STRIKE_FLOW_TOTAL,
   API_STRIKE_METRICS,
   API_STRIKE_PARAM_TOTAL,
   apiTotals,
@@ -23,12 +27,15 @@ import {
   PULLED_AT,
   unitMultiplier,
   WAREHOUSE,
+  WEB_DEPTH_FLOW,
+  WEB_DEPTH_FLOW_TOTAL,
   WEB_GREEK_TOTAL,
   WEB_GREEKS,
   WEB_HTTP_WINDOW_LABEL,
   WEB_MODULES,
   WEB_PATHS,
   WEB_STRIKE_EXPIRY,
+  WEB_STRIKE_FLOW,
   WEB_STRIKE_METRICS,
   WEB_STRIKE_PARAM_TOTAL,
   webTotals,
@@ -177,7 +184,9 @@ function WebReport() {
           <h2>What they actually pick</h2>
           <p>
             Same hours. Strike query string, not wicks. Heatmap greek is
-            which plotly path they hit.
+            which plotly path they hit. FLOW is{" "}
+            <code>flow_type=rolling</code> / <code>anchor</code> on Strike
+            and Depth View.
           </p>
         </div>
         <div className="split">
@@ -204,11 +213,32 @@ function WebReport() {
           total={WEB_STRIKE_PARAM_TOTAL}
           nameHeader="Selection"
         />
+        <div className="split">
+          <div>
+            <h3>Strike FLOW</h3>
+            <ShareTable
+              rows={WEB_STRIKE_FLOW}
+              total={WEB_STRIKE_PARAM_TOTAL}
+              nameHeader="Mode"
+            />
+          </div>
+          <div>
+            <h3>Depth FLOW</h3>
+            <ShareTable
+              rows={WEB_DEPTH_FLOW}
+              total={WEB_DEPTH_FLOW_TOTAL}
+              nameHeader="Mode"
+            />
+          </div>
+        </div>
         <p className="insight">
           Almost all of this is SPX. Lite is the cheap wedge: Gamma and GEX on
           0DTE. Net position is most of Strike — that starts at Core, with
-          Charm. Vanna, 3D, DEX / VEX / CEX, and picking a list of expirations
-          stay on Pro Max.
+          Charm. Vanna, 3D, DEX / VEX / CEX, picking a list of expirations,
+          and FLOW stay on Pro Max. FLOW is a thin slice: 9.1% of Strike,
+          6.4% of Depth, 7.6% of By Expiration, and never on Heatmap. Rolling
+          is the FLOW people actually use on Strike; Depth leans anchor.
+          Wicks never sent a FLOW param.
         </p>
       </section>
 
@@ -217,7 +247,8 @@ function WebReport() {
           <h2>If we split the $249 plan</h2>
           <p>
             Three live rungs. Lite is Gamma + GEX + 0DTE. Core adds net
-            position, Charm, and Depth View. Pro Max stays $249 for the rest.
+            position, Charm, and Depth View. FLOW, Vanna, 3D, and the rest
+            stay on Pro Max at $249.
           </p>
         </div>
         <div className="comparison" aria-label="Suggested plan prices">
@@ -244,9 +275,11 @@ function WebReport() {
         <p className="insight">
           Net position starts at Core — it is most of Strike, so that is the
           upgrade. Depth View is one chart (SciChart, looks like a table), not
-          a table vs heatmap split; it starts at Core. Delayed Pro at $199 is
-          worse than Lite and Core, so it probably gets folded. API and the vol
-          dashboard stay on Pro Max.
+          a table vs heatmap split; it starts at Core. FLOW is a second query
+          mode on top of snapshot, and only ~9% of Strike / ~6% of Depth use
+          it — that stays on Pro Max. Delayed Pro at $199 is worse than Lite
+          and Core, so it probably gets folded. API and the vol dashboard stay
+          on Pro Max.
         </p>
       </section>
 
@@ -408,7 +441,8 @@ function ApiReport() {
           <p>
             Same 30 days of APIRequestLog. Heatmap greek is the{" "}
             <code>type</code> query param. Strike expiration is{" "}
-            <code>expiration_type</code>.
+            <code>expiration_type</code>. FLOW is <code>mode=flow</code> vs{" "}
+            <code>mode=net</code>.
           </p>
         </div>
         <div className="split">
@@ -435,13 +469,34 @@ function ApiReport() {
           total={API_STRIKE_PARAM_TOTAL}
           nameHeader="Selection"
         />
+        <div className="split">
+          <div>
+            <h3>Strike FLOW</h3>
+            <ShareTable
+              rows={API_STRIKE_FLOW}
+              total={API_STRIKE_FLOW_TOTAL}
+              nameHeader="Mode"
+            />
+          </div>
+          <div>
+            <h3>Depth FLOW</h3>
+            <ShareTable
+              rows={API_DEPTH_FLOW}
+              total={API_DEPTH_FLOW_TOTAL}
+              nameHeader="Mode"
+            />
+          </div>
+        </div>
         <p className="insight">
           Gamma is still first, but Vanna is a much bigger share here than
           on web (~23% vs ~14%). The catch for a cheaper API tier:{" "}
           <code>expiration_type=all</code> is the most popular strike
           selection, and it is the expensive one. 0DTE and a specific date
           are the other two big buckets. Do not put “all expirations” in
-          basic just because people ask for it.
+          basic just because people ask for it. FLOW is even thinner than
+          on web: 1.4% of Strike, 3.4% of Depth, nine expiration calls.
+          Heatmap never sent <code>mode=flow</code>. Same call as web —
+          reserve it for the high tier.
         </p>
       </section>
 
