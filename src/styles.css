@@ -356,6 +356,10 @@ h3 {
   align-items: start;
 }
 
+.table-wrap + .split {
+  margin-top: 32px;
+}
+
 .model-stat {
   margin: 16px 0 12px;
 }
